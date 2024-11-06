@@ -1,0 +1,31 @@
+using UnityEngine;
+
+public class SteeringWheelController : MonoBehaviour
+{
+    [Header("Steering Settings")]
+    public float maxSteeringAngle = 180f; // Max rotation angle of the wheel
+    public float steeringSensitivity = 2.0f; // Speed of response for steering
+
+    private float currentSteeringAngle = 0f; // Current angle of the wheel
+
+    // Update is called once per frame
+    void Update()
+    {
+        HandleSteeringInput();
+    }
+
+    private void HandleSteeringInput()
+    {
+        // Assuming the VR input is an axis value between -1 and 1
+        float steerInput = Input.GetAxis("SteeringWheel"); 
+
+        // Calculate the target steering angle
+        float targetAngle = steerInput * maxSteeringAngle;
+
+        // Smoothly interpolate to the target angle
+        currentSteeringAngle = Mathf.Lerp(currentSteeringAngle, targetAngle, Time.deltaTime * steeringSensitivity);
+
+        // Apply the rotation to the steering wheel object
+        transform.localRotation = Quaternion.Euler(0f, 0f, -currentSteeringAngle);
+    }
+}
