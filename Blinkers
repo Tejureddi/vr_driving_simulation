@@ -1,0 +1,89 @@
+using UnityEngine;
+using System.Collections;
+
+public class BlinkerController : MonoBehaviour
+{
+    [Header("Blinker Settings")]
+    public Light leftBlinker; // Assign the left blinker light
+    public Light rightBlinker; // Assign the right blinker light
+    public float blinkInterval = 0.5f; // Interval in seconds for blinking
+
+    private bool isLeftBlinking = false;
+    private bool isRightBlinking = false;
+    private Coroutine leftBlinkerCoroutine;
+    private Coroutine rightBlinkerCoroutine;
+
+    void Update()
+    {
+        HandleBlinkerInput();
+    }
+
+    private void HandleBlinkerInput()
+    {
+        // Start or stop left blinker when "Q" is pressed
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            if (isLeftBlinking)
+            {
+                StopBlinker(ref leftBlinkerCoroutine, leftBlinker);
+                isLeftBlinking = false;
+            }
+            else
+            {
+                StartBlinker(ref leftBlinkerCoroutine, leftBlinker);
+                isLeftBlinking = true;
+                // Turn off right blinker if it's on
+                if (isRightBlinking)
+                {
+                    StopBlinker(ref rightBlinkerCoroutine, rightBlinker);
+                    isRightBlinking = false;
+                }
+            }
+        }
+
+        // Start or stop right blinker when "E" is pressed
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (isRightBlinking)
+            {
+                StopBlinker(ref rightBlinkerCoroutine, rightBlinker);
+                isRightBlinking = false;
+            }
+            else
+            {
+                StartBlinker(ref rightBlinkerCoroutine, rightBlinker);
+                isRightBlinking = true;
+                // Turn off left blinker if it's on
+                if (isLeftBlinking)
+                {
+                    StopBlinker(ref leftBlinkerCoroutine, leftBlinker);
+                    isLeftBlinking = false;
+                }
+            }
+        }
+    }
+
+    private void StartBlinker(ref Coroutine blinkerCoroutine, Light blinkerLight)
+    {
+        blinkerCoroutine = StartCoroutine(Blink(blinkerLight));
+    }
+
+    private void StopBlinker(ref Coroutine blinkerCoroutine, Light blinkerLight)
+    {
+        if (blinkerCoroutine != null)
+        {
+            StopCoroutine(blinkerCoroutine);
+            blinkerLight.enabled = false;
+            blinkerCoroutine = null;
+        }
+    }
+
+    private IEnumerator Blink(Light blinkerLight)
+    {
+        while (true)
+        {
+            blinkerLight.enabled = !blinkerLight.enabled;
+            yield return new WaitForSeconds(blinkInterval);
+        }
+    }
+}
